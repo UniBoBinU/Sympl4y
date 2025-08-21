@@ -1,0 +1,23 @@
+{
+  "poses": [
+    "assets/poses/pose-01.jpg",
+    "assets/poses/pose-02.jpg",
+    "assets/poses/pose-03.jpg",
+    "assets/poses/pose-04.jpg",
+    "assets/poses/pose-05.jpg",
+    "assets/poses/pose-06.jpg"
+  ],
+  "positions": [
+    "assets/positions/position-01.jpg",
+    "assets/positions/position-02.png",
+    "assets/positions/position-03.jpg",
+    "assets/positions/position-04.png",
+    "assets/positions/position-05.jpg",
+    "assets/positions/position-06.png"
+  ],
+  "sfx": [
+    "assets/sfx/licking.wav",
+    "assets/sfx/yes-daddy.mp3",
+    "assets/sfx/orgasm-man.wav"
+  ]
+}

@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <meta name="theme-color" content="#7c3aed"/>
+  <link rel="manifest" href="public/manifest.json">
+  <title>Sympli_FUCKnCARDS — PL4Y</title>
+  <style>
+    :root {
+      --bg:#000;
+      --panel:#140016;
+      --panel2:#1a0021;
+      --primary:#7c3aed; /* purple */
+      --accent:#ec4899;  /* magenta */
+      --cyan:#00ffff;
+      --text:#e5e7eb; /* very light gray, not white */
+    }
+    * { box-sizing:border-box; }
+    html,body { margin:0; height:100%; background:var(--bg); color:var(--text); font-family:ui-sans-serif,system-ui,Segoe UI,Roboto; }
+    body::before{
+      content:""; position:fixed; inset:0; pointer-events:none;
+      background: radial-gradient(60% 80% at 20% 10%, rgba(124,58,237,.15), transparent 60%),
+                  radial-gradient(80% 60% at 80% 90%, rgba(236,72,153,.15), transparent 60%);
+      filter: blur(30px);
+    }
+    .wrap { max-width:720px; margin:0 auto; padding:16px; display:flex; flex-direction:column; min-height:100dvh; }
+    .title { text-align:center; font-weight:800; font-size:28px; letter-spacing:.5px;
+      background:linear-gradient(135deg,var(--primary),var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin:8px 0 4px;
+      text-shadow:0 0 18px rgba(0,255,255,.25);
+    }
+    .sub { text-align:center; color:var(--cyan); font-size:14px; margin-bottom:16px; opacity:.85 }
+    .card { background:linear-gradient(135deg, rgba(124,58,237,.18), rgba(236,72,153,.18));
+      border:1px solid rgba(0,255,255,.25); border-radius:16px; padding:14px; }
+    .row { display:flex; gap:8px; flex-wrap:wrap }
+    .btn { flex:1; min-width:120px; padding:12px 14px; border-radius:12px; border:1px solid rgba(0,255,255,.35);
+      background:rgba(124,58,237,.18); color:var(--text); font-weight:700; text-align:center; cursor:pointer; transition:.15s transform;
+    }
+    .btn:hover { transform:translateY(-2px) }
+    .btn.primary { background:linear-gradient(135deg,var(--primary),var(--accent)); border-color:var(--cyan); }
+    .btn.ghost { background:transparent }
+    .tag { display:inline-block; padding:4px 8px; border-radius:999px; font-size:11px; font-weight:800;
+      border:1px solid rgba(0,255,255,.35); margin-right:6px; color:var(--cyan) }
+    .stack { display:flex; flex-direction:column; gap:10px }
+    .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:8px }
+    .footer { margin-top:auto; padding:10px 0; opacity:.75; font-size:12px; text-align:center }
+    .hide { display:none !important }
+    img.preview { width:100%; border-radius:12px; border:1px solid rgba(0,255,255,.25) }
+    audio { width:100% }
+    input,select { background:#0b0010; color:var(--text); border:1px solid rgba(0,255,255,.25); border-radius:10px; padding:10px }
+    label { font-size:12px; opacity:.85 }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1 class="title">Sympli_FUCKnCARDS — PL4Y</h1>
+    <div class="sub">Purple/Black/Magenta/Cyan • No white • Mobile-first PWA</div>
+
+    <!-- Setup Panel -->
+    <section id="setup" class="card stack">
+      <div class="grid2">
+        <div class="stack">
+          <label>Players (comma separated)</label>
+          <input id="playersInput" placeholder="e.g., Dusty, Tae Tae" />
+        </div>
+        <div class="stack">
+          <label>Categories</label>
+          <div class="row">
+            <button data-cat="QUESTION" class="btn small" aria-pressed="true">Questions</button>
+            <button data-cat="DARE" class="btn small" aria-pressed="true">Dares</button>
+            <button data-cat="DRINK" class="btn small" aria-pressed="true">Drink</button>
+            <button data-cat="CHOICE" class="btn small" aria-pressed="true">Choice</button>
+            <button data-cat="POSITION" class="btn small" aria-pressed="true">Position</button>
+            <button data-cat="POSE" class="btn small" aria-pressed="true">Pose</button>
+            <button data-cat="EVENT" class="btn small" aria-pressed="true">Event</button>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <button id="startBtn" class="btn primary">Start</button>
+        <button id="installBtn" class="btn ghost">Install App</button>
+      </div>
+    </section>
+
+    <!-- Game Panel -->
+    <section id="game" class="card stack hide">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div>
+          <span class="tag" id="turnTag">Turn: —</span>
+          <span class="tag" id="remainTag">Remaining: —</span>
+        </div>
+        <div class="row" style="gap:6px">
+          <button id="toSetup" class="btn ghost">Settings</button>
+          <button id="reshuffle" class="btn ghost">Reshuffle</button>
+        </div>
+      </div>
+
+      <div id="cardView" class="stack">
+        <div id="badges"></div>
+        <div id="text" style="font-size:18px;line-height:1.5;min-height:72px"></div>
+        <img id="imgPreview" class="preview hide" alt="preview"/>
+        <audio id="audio" controls class="hide"></audio>
+      </div>
+
+      <div id="choiceBox" class="row hide">
+        <button id="choiceA" class="btn">A</button>
+        <button id="choiceB" class="btn">B</button>
+      </div>
+
+      <div class="row">
+        <button id="skip" class="btn">Skip</button>
+        <button id="next" class="btn primary">Done / Next</button>
+      </div>
+    </section>
+
+    <div class="footer">PWA offline-ready • Drop assets into <b>/assets</b> • GPL-3.0</div>
+  </div>
+
+  <script type="module">
+    // Simple PWA bootstrap
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('public/service-worker.js');
+    }
+
+    // Elements
+    const setup = document.getElementById('setup');
+    const game = document.getElementById('game');
+    const playersInput = document.getElementById('playersInput');
+    const remainTag = document.getElementById('remainTag');
+    const turnTag = document.getElementById('turnTag');
+    const textEl = document.getElementById('text');
+    const imgEl = document.getElementById('imgPreview');
+    const audioEl = document.getElementById('audio');
+    const badges = document.getElementById('badges');
+    const choiceBox = document.getElementById('choiceBox');
+    const choiceA = document.getElementById('choiceA');
+    const choiceB = document.getElementById('choiceB');
+
+    const catButtons = Array.from(document.querySelectorAll('[data-cat]'));
+
+    // State
+    const state = {
+      deck: [], used: new Set(), last:null, turnIndex:0,
+      players: [],
+      assets: { poses:[], positions:[], sfx:[] },
+      categories: new Set(['QUESTION','DARE','DRINK','CHOICE','POSITION','POSE','EVENT']),
+      actions: null
+    };
+
+    catButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cat = btn.dataset.cat;
+        const pressed = btn.getAttribute('aria-pressed') === 'true';
+        btn.setAttribute('aria-pressed', String(!pressed));
+        if (pressed) { state.categories.delete(cat); btn.style.opacity = .5; }
+        else { state.categories.add(cat); btn.style.opacity = 1; }
+      });
+    });
+
+    async function loadAll() {
+      const [actions, assets] = await Promise.all([
+        fetch('actions.json').then(r=>r.json()),
+        fetch('assets.json').then(r=>r.json()).catch(()=>({poses:[],positions:[],sfx:[]}))
+      ]);
+      state.actions = actions;
+      state.assets = assets;
+    }
+
+    function buildDeck() {
+      const d = [];
+      const A = state.actions;
+      const push = (cat, payload) => d.push({cat, payload});
+      for (const cat of Object.keys(A)) {
+        if (!state.categories.has(cat)) continue;
+        if (cat === 'CHOICE') {
+          for (const pair of A.CHOICE) push('CHOICE', pair);
+        } else if (Array.isArray(A[cat])) {
+          for (const t of A[cat]) push(cat, t);
+        }
+      }
+      // Positions from actions + assets
+      if (state.categories.has('POSITION')) {
+        for (const p of state.assets.positions) push('POSITION', {url:p, text:'Try this position!'});
+      }
+      // Poses (separate type)
+      if (state.categories.has('POSE')) {
+        for (const p of state.assets.poses) push('POSE', {url:p, text:'Copy this pose!'});
+      }
+      // Shuffle
+      for (let i=d.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [d[i],d[j]]=[d[j],d[i]]; }
+      state.deck = d; state.used = new Set();
+    }
+
+    function nextPlayer() {
+      if (state.players.length === 0) return '—';
+      const name = state.players[state.turnIndex % state.players.length];
+      state.turnIndex = (state.turnIndex + 1) % state.players.length;
+      return name;
+    }
+
+    function draw() {
+      let idx = -1;
+      for (let i=0;i<state.deck.length;i++){
+        if (!state.used.has(i)) { idx = i; break; }
+      }
+      if (idx === -1) return null;
+      state.used.add(idx);
+      state.last = idx;
+      return state.deck[idx];
+    }
+
+    function remaining() { return state.deck.length - state.used.size; }
+
+    function show(card) {
+      badges.innerHTML = '';
+      textEl.textContent = '';
+      imgEl.classList.add('hide');
+      audioEl.classList.add('hide');
+      choiceBox.classList.add('hide');
+
+      if (!card) {
+        textEl.textContent = 'Deck empty. Tap Reshuffle.';
+        remainTag.textContent = 'Remaining: 0';
+        return;
+      }
+      const b = document.createElement('span');
+      b.className = 'tag'; b.textContent = card.cat;
+      badges.appendChild(b);
+
+      if (card.cat === 'CHOICE') {
+        choiceBox.classList.remove('hide');
+        const [a,b_] = card.payload;
+        choiceA.textContent = `A) ${a}`;
+        choiceB.textContent = `B) ${b_}`;
+        textEl.textContent = 'Pick one:';
+      } else if (card.cat === 'POSITION' || card.cat === 'POSE') {
+        textEl.textContent = card.payload.text || (card.cat === 'POSE' ? 'Copy this pose!' : 'Try this position!');
+        imgEl.src = card.payload.url;
+        imgEl.classList.remove('hide');
+      } else if (card.cat === 'DRINK' || card.cat === 'QUESTION' || card.cat === 'DARE' || card.cat === 'EVENT') {
+        textEl.textContent = (typeof card.payload === 'string') ? card.payload : JSON.stringify(card.payload);
+      } else {
+        textEl.textContent = JSON.stringify(card.payload);
+      }
+
+      // Random SFX on reveal if available
+      if (state.assets.sfx && state.assets.sfx.length > 0) {
+        const pick = state.assets.sfx[Math.floor(Math.random()*state.assets.sfx.length)];
+        audioEl.src = pick; audioEl.classList.remove('hide');
+        // Do not autoplay to respect mobile policies
+      }
+
+      remainTag.textContent = 'Remaining: ' + remaining();
+    }
+
+    function start() {
+      const players = playersInput.value.split(',').map(s=>s.trim()).filter(Boolean);
+      state.players = players.length ? players : ['Player A','Player B'];
+      state.turnIndex = 0;
+      buildDeck();
+      remainTag.textContent = 'Remaining: ' + remaining();
+      turnTag.textContent = 'Turn: ' + nextPlayer();
+      setup.classList.add('hide');
+      game.classList.remove('hide');
+      show(draw());
+    }
+
+    document.getElementById('startBtn').addEventListener('click', start);
+    document.getElementById('installBtn').addEventListener('click', async () => {
+      // Minimal standalone install hint (most browsers show their own A2HS)
+      alert('Tip: Use your browser menu • Add to Home Screen to install.');
+    });
+    document.getElementById('toSetup').addEventListener('click', ()=>{ setup.classList.remove('hide'); game.classList.add('hide'); });
+    document.getElementById('reshuffle').addEventListener('click', ()=>{ buildDeck(); remainTag.textContent='Remaining: '+remaining(); });
+    document.getElementById('skip').addEventListener('click', ()=>{ turnTag.textContent = 'Turn: ' + nextPlayer(); show(draw()); });
+    document.getElementById('next').addEventListener('click', ()=>{ turnTag.textContent = 'Turn: ' + nextPlayer(); show(draw()); });
+    choiceA.addEventListener('click', ()=>{ turnTag.textContent = 'Turn: ' + nextPlayer(); show(draw()); });
+    choiceB.addEventListener('click', ()=>{ turnTag.textContent = 'Turn: ' + nextPlayer(); show(draw()); });
+
+    // Preload and kick off
+    loadAll();
+  </script>
+</body>
+</html>
