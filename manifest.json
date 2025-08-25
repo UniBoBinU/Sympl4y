@@ -1,0 +1,31 @@
+﻿{
+  "version": 1,
+  "datasets": {
+    "choices": "actions/choices.json",
+    "drinks": "actions/drinks.json",
+    "questions": "actions/questions.json",
+    "dares": "actions/dares.json",
+    "events": "actions/events.json"
+  },
+  "images": {
+    "positions": {
+      "dir": "assets/positions",
+      "pattern": "positions-{NN}.jpg",
+      "count": 36,
+      "pad": 2,
+      "start": 1
+    },
+    "poses": {
+      "dir": "assets/poses",
+      "pattern": "pose-{NN}.jpg",
+      "count": 42,
+      "pad": 2,
+      "start": 1
+    }
+  },
+  "sfx": {
+    "dir": "assets/sfx",
+    "pattern": "reveal-{NN}.mp3",
+    "optional": true
+  }
+}
